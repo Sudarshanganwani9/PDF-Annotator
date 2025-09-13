@@ -1,20 +1,32 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FileText, User, Lock, Mail, Eye, EyeOff } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 export const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
     confirmPassword: "",
     name: ""
   });
+  
+  const { signIn, signUp, user } = useAuth();
+  const navigate = useNavigate();
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard');
+    }
+  }, [user, navigate]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -23,10 +35,30 @@ export const Auth = () => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement authentication with Supabase
-    console.log('Auth form submitted:', formData);
+    setLoading(true);
+
+    try {
+      if (isLogin) {
+        const { error } = await signIn(formData.email, formData.password);
+        if (!error) {
+          navigate('/dashboard');
+        }
+      } else {
+        if (formData.password !== formData.confirmPassword) {
+          alert('Passwords do not match');
+          return;
+        }
+        
+        const { error } = await signUp(formData.email, formData.password, formData.name);
+        if (!error) {
+          // User will be redirected after email confirmation
+        }
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -154,7 +186,10 @@ export const Auth = () => {
               )}
 
               {/* Submit Button */}
-              <Button type="submit" variant="professional" size="lg" className="w-full">
+              <Button type="submit" variant="professional" size="lg" className="w-full" disabled={loading}>
+                {loading ? (
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                ) : null}
                 {isLogin ? "Sign In" : "Create Account"}
               </Button>
 

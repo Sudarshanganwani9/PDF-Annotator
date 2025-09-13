@@ -14,6 +14,50 @@ export type Database = {
   }
   public: {
     Tables: {
+      annotations: {
+        Row: {
+          created_at: string
+          document_id: string
+          highlight_color: string
+          highlight_text: string
+          id: string
+          page_number: number
+          position_data: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          document_id: string
+          highlight_color?: string
+          highlight_text: string
+          id?: string
+          page_number: number
+          position_data?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          document_id?: string
+          highlight_color?: string
+          highlight_text?: string
+          id?: string
+          page_number?: number
+          position_data?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "annotations_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "pdf_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       appointments: {
         Row: {
           appointment_date: string
@@ -323,6 +367,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      pdf_documents: {
+        Row: {
+          created_at: string
+          file_name: string
+          file_size: number
+          file_url: string
+          id: string
+          title: string
+          total_pages: number | null
+          updated_at: string
+          upload_date: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          file_name: string
+          file_size: number
+          file_url: string
+          id?: string
+          title: string
+          total_pages?: number | null
+          updated_at?: string
+          upload_date?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          file_name?: string
+          file_size?: number
+          file_url?: string
+          id?: string
+          title?: string
+          total_pages?: number | null
+          updated_at?: string
+          upload_date?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       portfolio_stocks: {
         Row: {
